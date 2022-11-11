@@ -88,7 +88,7 @@ const NextButton = ({
             indexIncrementer++;
           } else {
             //@ts-ignore
-            navigation.navigate('MainScreen');
+            navigation.navigate('SignInScreen');
           }
         }}>
         {({pressed}) => (
@@ -217,7 +217,7 @@ export default function Onboarding() {
         style={{position: 'absolute', bottom: height * 0.1}}
         onPress={() => {
           //@ts-ignore
-          navigation.navigate('MainScreen');
+          navigation.navigate('SignInScreen');
         }}>
         <Text>Skip</Text>
       </TouchableOpacity>

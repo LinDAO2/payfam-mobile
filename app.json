@@ -1,4 +1,10 @@
 {
   "name": "PayFam",
-  "displayName": "PayFam"
+  "displayName": "PayFam",
+  "plugins": [
+    "@react-native-firebase/app",
+    "@react-native-firebase/firestore",
+    "@react-native-firebase/auth"
+    
+  ]
 }

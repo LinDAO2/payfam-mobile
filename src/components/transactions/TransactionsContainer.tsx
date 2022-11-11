@@ -1,14 +1,11 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import {StyleSheet} from 'react-native';
+import React from 'react';
+import TransactionList from './TransactionList';
 
 const TransactionsContainer = () => {
-  return (
-    <View>
-      <Text>TransactionsContainer</Text>
-    </View>
-  )
-}
+  return <TransactionList />;
+};
 
-export default TransactionsContainer
+export default TransactionsContainer;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});

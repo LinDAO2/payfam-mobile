@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "474307531693",
+    "project_id": "mattosha-portfolio",
+    "storage_bucket": "mattosha-portfolio.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:474307531693:android:25212b1f3e9570decec724",
+        "android_client_info": {
+          "package_name": "com.payfam"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "474307531693-o0etl01k1sks5nd1a8gmlk4t8opai579.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWybTh0tVwsU-cf7LI1pepd9WaPu_o-XU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "474307531693-o0etl01k1sks5nd1a8gmlk4t8opai579.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

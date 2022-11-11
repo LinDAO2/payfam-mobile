@@ -1,4 +1,5 @@
 import {
+  Alert,
   Animated,
   Dimensions,
   Image,
@@ -20,7 +21,10 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {generateUUIDV4} from '@utils/funcs';
 import NotificationContainer from '@components/notification/NotificationContainer';
-
+import {useSession} from '@hooks/app-hooks';
+import {useNavigation} from '@react-navigation/native';
+import ActivityLogContainer from '@components/activityLog/ActivityLogContainer';
+import auth from '@react-native-firebase/auth';
 const {width} = Dimensions.get('window');
 const TabButton = (
   currentTab: string,
@@ -29,12 +33,30 @@ const TabButton = (
   image: any,
   scalingView: any,
 ) => {
+  const navigation = useNavigation();
   return (
     <TouchableOpacity
       onPress={() => {
         if (title == 'LogOut') {
           // Do your Stuff...
-          scalingView();
+
+          Alert.alert('Are you sure?', 'You are about to be logged out', [
+            {
+              text: 'Cancel',
+              onPress: () => {
+                scalingView();
+              },
+              style: 'cancel',
+            },
+            {
+              text: 'Sign out',
+              onPress: async () => {
+                await auth().signOut();
+                navigation.navigate('SignInScreen');
+                scalingView();
+              },
+            },
+          ]);
         } else {
           setCurrentTab(title);
           scalingView();
@@ -85,6 +107,10 @@ const MainScreen = () => {
   const [showButtonTabMenu, setShowButtonTabMenu] = useState(false);
 
   const buttonTabMenuContainerValue = useRef(new Animated.Value(0)).current;
+
+  const navigation = useNavigation();
+
+  const profile = useSession();
 
   const ScalingView = () => {
     Animated.timing(scaleValue, {
@@ -170,93 +196,97 @@ const MainScreen = () => {
             }}
           />
         </View>
-        <View style={{width: 150, alignItems: 'center', marginTop: 50}}>
-          <Image
-            source={{
-              uri: `https://avatars.dicebear.com/api/pixel-art/kay.png`,
-            }}
-            style={{
-              width: 70,
-              height: 70,
-            }}
-          />
-          <Text
-            style={{
-              fontSize: 20,
-              fontWeight: 'bold',
-              color: 'white',
-              marginTop: 1,
-            }}>
-            @mattosha
-          </Text>
-          <TouchableOpacity>
-            <Text
-              style={{
-                marginTop: 6,
-                color: 'white',
-              }}>
-              View Profile
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <View style={{flexGrow: 1, marginTop: 10}}>
-          {
-            // Tab Bar Buttons....
-          }
+        {profile.uid !== '' && (
+          <>
+            <View style={{width: 150, alignItems: 'center', marginTop: 50}}>
+              <Image
+                source={{
+                  uri: `https://avatars.dicebear.com/api/pixel-art/${profile.username}.png`,
+                }}
+                style={{
+                  width: 70,
+                  height: 70,
+                }}
+              />
+              <Text
+                style={{
+                  fontSize: 20,
+                  fontWeight: 'bold',
+                  color: 'white',
+                  marginTop: 1,
+                }}>
+                @{profile.username}
+              </Text>
+              <TouchableOpacity>
+                <Text
+                  style={{
+                    marginTop: 6,
+                    color: 'white',
+                  }}>
+                  View Profile
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{flexGrow: 1, marginTop: 10}}>
+              {
+                // Tab Bar Buttons....
+              }
 
-          {/* {TabButton(
+              {/* {TabButton(
             currentTab,
             setCurrentTab,
             'Home',
             require('assets/images/home.png'),
             ScalingView,
           )} */}
-          {TabButton(
-            currentTab,
-            setCurrentTab,
-            'Send Money',
-            require('assets/images/upload.png'),
-            ScalingView,
-          )}
-          {TabButton(
-            currentTab,
-            setCurrentTab,
-            'Redeem Money',
-            require('assets/images/download.png'),
-            ScalingView,
-          )}
-          {TabButton(
-            currentTab,
-            setCurrentTab,
-            'Transactions',
-            require('assets/images/receipt.png'),
-            ScalingView,
-          )}
-          {TabButton(
-            currentTab,
-            setCurrentTab,
-            'My Wallet',
-            require('assets/images/wallet.png'),
-            ScalingView,
-          )}
-          {TabButton(
-            currentTab,
-            setCurrentTab,
-            'Settings',
-            require('assets/images/settings.png'),
-            ScalingView,
-          )}
-        </View>
+              {TabButton(
+                currentTab,
+                setCurrentTab,
+                'Send Money',
+                require('assets/images/upload.png'),
+                ScalingView,
+              )}
+              {TabButton(
+                currentTab,
+                setCurrentTab,
+                'Redeem Money',
+                require('assets/images/download.png'),
+                ScalingView,
+              )}
+              {TabButton(
+                currentTab,
+                setCurrentTab,
+                'Transactions',
+                require('assets/images/receipt.png'),
+                ScalingView,
+              )}
+              {TabButton(
+                currentTab,
+                setCurrentTab,
+                'My Wallet',
+                require('assets/images/wallet.png'),
+                ScalingView,
+              )}
+              {TabButton(
+                currentTab,
+                setCurrentTab,
+                'Settings',
+                require('assets/images/settings.png'),
+                ScalingView,
+              )}
+            </View>
 
-        <View>
-          {TabButton(
-            currentTab,
-            setCurrentTab,
-            'LogOut',
-            require('assets/images/power.png'),
-            ScalingView,
-          )}
-        </View>
+            <View>
+              {TabButton(
+                currentTab,
+                setCurrentTab,
+                'LogOut',
+                require('assets/images/power.png'),
+                ScalingView,
+              )}
+            </View>
+          </>
+        )}
       </View>
 
       <Animated.View
@@ -313,8 +343,11 @@ const MainScreen = () => {
                 position: 'absolute',
                 right: 20,
                 top: 30,
+                flexDirection: 'row',
+                alignItems: 'center',
               }}>
               <NotificationContainer />
+              <ActivityLogContainer />
             </View>
             <Text
               style={{
@@ -322,6 +355,7 @@ const MainScreen = () => {
                 fontWeight: 'bold',
                 color: 'black',
                 paddingTop: 20,
+                textAlign: 'center',
               }}>
               {currentTab}
             </Text>
@@ -456,7 +490,10 @@ const MainScreen = () => {
                 color="#f9e969ff"
               />
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('AccountScreen');
+              }}>
               <FontAwesome5 name="user-circle" size={35} color="#047cfdff" />
             </TouchableOpacity>
           </View>
