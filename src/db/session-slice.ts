@@ -5,6 +5,7 @@ import {IProfileDocument} from 'types/session-types';
 export interface ISessionState extends IProfileDocument {
   isLoaded: boolean;
   isEmpty: boolean;
+  reload: boolean;
 }
 
 export interface ISetProfile extends ISessionState {}
@@ -32,6 +33,7 @@ const initialState: ISessionState = {
 
   isLoaded: false,
   isEmpty: true,
+  reload: false,
 };
 
 export const sessionSlice = createSlice({
@@ -40,6 +42,10 @@ export const sessionSlice = createSlice({
   reducers: {
     set: (state, action: PayloadAction<ISetProfile>) => {
       state = {...action.payload};
+      return state;
+    },
+    setReload: (state, action: PayloadAction<boolean>) => {
+      state.reload = action.payload;
       return state;
     },
     reset: state => {

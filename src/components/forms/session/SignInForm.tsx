@@ -9,12 +9,12 @@ import React, {useEffect, useRef, useState} from 'react';
 import {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import PhoneInput from 'react-native-phone-number-input';
 import {Button, Text, TextInput} from 'react-native-paper';
-import {collectionServices, sessionServices} from '@services/root';
+import {collectionServices, sessionServices} from '../../../services/root';
 import {COLLECTIONS} from 'contants/collections';
 import {IProfileDocument} from '@types/session-types';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
-import {useSession} from '@hooks/app-hooks';
+import {useSession} from '../../../hooks/app-hooks';
 
 const {width} = Dimensions.get('screen');
 

@@ -1,6 +1,6 @@
-import {Dimensions, FlatList, Image, StyleSheet} from 'react-native';
+import {Dimensions} from 'react-native';
 import React from 'react';
-import {generateUUIDV4} from '@utils/funcs';
+import Carousel from '@components/common/Carousel';
 
 const {width} = Dimensions.get('window');
 
@@ -14,30 +14,12 @@ const HomeContainer = () => {
 
   return (
     <>
-      <FlatList
-        data={ADS_LIST}
-        keyExtractor={_ => generateUUIDV4()}
-        renderItem={({item}) => {
-          return (
-            <Image
-              source={{
-                uri: item,
-              }}
-              style={{
-                width: width - 30,
-                height: 150,
-                borderRadius: 6,
-              }}
-            />
-          );
-        }}
-        horizontal
-        pagingEnabled
+      <Carousel
+        images={ADS_LIST}
+        imageCardSize={{width: width - 30, height: 150}}
       />
     </>
   );
 };
 
 export default HomeContainer;
-
-const styles = StyleSheet.create({});

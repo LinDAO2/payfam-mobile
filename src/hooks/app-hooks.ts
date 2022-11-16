@@ -8,3 +8,7 @@ export const useSession = () => {
 export const useCollection = () => {
   return useAppSelector((state) => state.collection);
 };
+
+export const useGlobal = () => {
+  return useAppSelector((state) => state.global);
+};

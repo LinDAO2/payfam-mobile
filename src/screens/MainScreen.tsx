@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import HomeContainer from '@components/home/HomeContainer';
 import SendMoneyContainer from '@components/send-money/SendMoneyContainer';
@@ -25,6 +25,7 @@ import {useSession} from '@hooks/app-hooks';
 import {useNavigation} from '@react-navigation/native';
 import ActivityLogContainer from '@components/activityLog/ActivityLogContainer';
 import auth from '@react-native-firebase/auth';
+import {setPageState} from '@helpers/collection-helpers';
 const {width} = Dimensions.get('window');
 const TabButton = (
   currentTab: string,
@@ -112,6 +113,13 @@ const MainScreen = () => {
 
   const profile = useSession();
 
+  useEffect(() => {
+    setPageState('customer');
+  }, []);
+
+  const profileID = useSession().uid;
+  const wallet = useSession().wallet;
+
   const ScalingView = () => {
     Animated.timing(scaleValue, {
       toValue: showMenu ? 1 : 0.88,
@@ -196,97 +204,96 @@ const MainScreen = () => {
             }}
           />
         </View>
-        {profile.uid !== '' && (
-          <>
-            <View style={{width: 150, alignItems: 'center', marginTop: 50}}>
-              <Image
-                source={{
-                  uri: `https://avatars.dicebear.com/api/pixel-art/${profile.username}.png`,
-                }}
-                style={{
-                  width: 70,
-                  height: 70,
-                }}
-              />
+
+        <>
+          <View style={{width: 150, alignItems: 'center', marginTop: 50}}>
+            <Image
+              source={{
+                uri: `https://avatars.dicebear.com/api/pixel-art/${profile.username}.png`,
+              }}
+              style={{
+                width: 70,
+                height: 70,
+              }}
+            />
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: 'bold',
+                color: 'white',
+                marginTop: 1,
+              }}>
+              @{profile.username}
+            </Text>
+            <TouchableOpacity>
               <Text
                 style={{
-                  fontSize: 20,
-                  fontWeight: 'bold',
+                  marginTop: 6,
                   color: 'white',
-                  marginTop: 1,
                 }}>
-                @{profile.username}
+                View Profile
               </Text>
-              <TouchableOpacity>
-                <Text
-                  style={{
-                    marginTop: 6,
-                    color: 'white',
-                  }}>
-                  View Profile
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View style={{flexGrow: 1, marginTop: 10}}>
-              {
-                // Tab Bar Buttons....
-              }
+            </TouchableOpacity>
+          </View>
+          <View style={{flexGrow: 1, marginTop: 10}}>
+            {
+              // Tab Bar Buttons....
+            }
 
-              {/* {TabButton(
+            {/* {TabButton(
             currentTab,
             setCurrentTab,
             'Home',
             require('assets/images/home.png'),
             ScalingView,
           )} */}
-              {TabButton(
-                currentTab,
-                setCurrentTab,
-                'Send Money',
-                require('assets/images/upload.png'),
-                ScalingView,
-              )}
-              {TabButton(
-                currentTab,
-                setCurrentTab,
-                'Redeem Money',
-                require('assets/images/download.png'),
-                ScalingView,
-              )}
-              {TabButton(
-                currentTab,
-                setCurrentTab,
-                'Transactions',
-                require('assets/images/receipt.png'),
-                ScalingView,
-              )}
-              {TabButton(
-                currentTab,
-                setCurrentTab,
-                'My Wallet',
-                require('assets/images/wallet.png'),
-                ScalingView,
-              )}
-              {TabButton(
-                currentTab,
-                setCurrentTab,
-                'Settings',
-                require('assets/images/settings.png'),
-                ScalingView,
-              )}
-            </View>
+            {TabButton(
+              currentTab,
+              setCurrentTab,
+              'Send Money',
+              require('assets/images/upload.png'),
+              ScalingView,
+            )}
+            {TabButton(
+              currentTab,
+              setCurrentTab,
+              'Redeem Money',
+              require('assets/images/download.png'),
+              ScalingView,
+            )}
+            {TabButton(
+              currentTab,
+              setCurrentTab,
+              'Transactions',
+              require('assets/images/receipt.png'),
+              ScalingView,
+            )}
+            {TabButton(
+              currentTab,
+              setCurrentTab,
+              'My Wallet',
+              require('assets/images/wallet.png'),
+              ScalingView,
+            )}
+            {TabButton(
+              currentTab,
+              setCurrentTab,
+              'Settings',
+              require('assets/images/settings.png'),
+              ScalingView,
+            )}
+          </View>
 
-            <View>
-              {TabButton(
-                currentTab,
-                setCurrentTab,
-                'LogOut',
-                require('assets/images/power.png'),
-                ScalingView,
-              )}
-            </View>
-          </>
-        )}
+          <View>
+            {TabButton(
+              currentTab,
+              setCurrentTab,
+              'LogOut',
+              require('assets/images/power.png'),
+              ScalingView,
+            )}
+          </View>
+        </>
       </View>
 
       <Animated.View
@@ -370,7 +377,13 @@ const MainScreen = () => {
             {currentTab === 'Send Money' && <SendMoneyContainer />}
             {currentTab === 'Redeem Money' && <RedeemMoneyContainer />}
             {currentTab === 'Transactions' && <TransactionsContainer />}
-            {currentTab === 'My Wallet' && <WalletContainer />}
+            {currentTab === 'My Wallet' && (
+              <WalletContainer
+                userId={profileID}
+                persona="customer"
+                wallet={wallet}
+              />
+            )}
             {currentTab === 'Settings' && <SettingsContainer />}
           </View>
         </Animated.View>

@@ -1,4 +1,28 @@
 import uuid from 'react-native-uuid';
+import { Currency, Dinero, toFormat } from "dinero.js";
+
+export function intlFormat(
+  dineroObject: Dinero<number>,
+  locale: string,
+  options = {}
+) {
+  function transformer({
+    amount,
+    currency,
+  }: {
+    amount: number;
+    currency: Currency<number>;
+  }) {
+    return amount.toLocaleString(locale, {
+      ...options,
+      style: "currency",
+      currency: currency.code,
+    });
+  }
+
+  return toFormat(dineroObject, transformer);
+}
+
 
 export const generateUUIDV4 = ():string => {
   return uuid.v4() as string;

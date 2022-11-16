@@ -1,14 +1,17 @@
 import React, {FC, ReactNode, useEffect} from 'react';
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
-import {collectionServices} from '@services/root';
 import {COLLECTIONS} from 'contants/collections';
 import {IProfileDocument} from '@types/session-types';
 import {resetProfile, setProfile} from '@helpers/session-helpers';
+import {collectionServices} from '@services/root';
+import {useSession} from '@hooks/app-hooks';
 
 interface Props {
   children: ReactNode | ReactNode[];
 }
 const AppAuth: FC<Props> = ({children}) => {
+  const profileReload = useSession().reload;
+
   async function onAuthStateChanged(user: any) {
     if (user) {
       // User is signed in
@@ -24,6 +27,7 @@ const AppAuth: FC<Props> = ({children}) => {
           const profile: IProfileDocument & {
             isLoaded: boolean;
             isEmpty: boolean;
+            reload: boolean;
           } = {
             uid: credential.uid,
             firstName: data.firstName,
@@ -50,6 +54,7 @@ const AppAuth: FC<Props> = ({children}) => {
 
             isLoaded: true,
             isEmpty: false,
+            reload: false,
           };
           setProfile(profile);
         }
@@ -63,7 +68,7 @@ const AppAuth: FC<Props> = ({children}) => {
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
     return subscriber; // unsubscribe on unmount
-  }, []);
+  }, [profileReload]);
 
   return <>{children}</>;
 };
