@@ -7,6 +7,7 @@ import {IProfilePersonas} from '@types/session-types';
 import {Alert} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {ITransactionCurrency} from '@types/transactions-types';
 
 export const setShowLoadMoreBtn = (state: boolean) => {
   store.dispatch(collectionActions.setCollectionStateShowLoadMoreBtn(state));
@@ -109,5 +110,21 @@ export const getActivitySpaceIcon = (space: activitySpaceType) => {
           color="#f9e969ff"
         />
       );
+  }
+};
+
+export const getCurrencyImage = (currency: ITransactionCurrency) => {
+  switch (currency) {
+    case 'NGN':
+      return require('assets/images/naira.png');
+    case 'GHS':
+      return require('assets/images/cedis.png');
+    case 'GHC':
+      return require('assets/images/cedis.png');
+    case 'USDT':
+      return require('assets/images/tether.png');
+
+    default:
+      return require('assets/images/naira.png');
   }
 };

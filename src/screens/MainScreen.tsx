@@ -26,6 +26,7 @@ import {useNavigation} from '@react-navigation/native';
 import ActivityLogContainer from '@components/activityLog/ActivityLogContainer';
 import auth from '@react-native-firebase/auth';
 import {setPageState} from '@helpers/collection-helpers';
+import {setProfileReload} from '@helpers/session-helpers';
 const {width} = Dimensions.get('window');
 const TabButton = (
   currentTab: string,
@@ -115,6 +116,7 @@ const MainScreen = () => {
 
   useEffect(() => {
     setPageState('customer');
+    setProfileReload(true);
   }, []);
 
   const profileID = useSession().uid;

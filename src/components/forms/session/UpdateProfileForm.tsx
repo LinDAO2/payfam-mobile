@@ -18,6 +18,7 @@ import {collectionServices} from '@services/root';
 import {COLLECTIONS} from 'contants/collections';
 import {useNavigation} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
+import {setProfileReload} from '@helpers/session-helpers';
 
 const {width} = Dimensions.get('window');
 const SignInValidation = object({
@@ -63,6 +64,7 @@ const UpdateProfileForm = () => {
           );
           if (status === 'success') {
             setSubmitting(false);
+            setProfileReload(true);
             navigation.navigate('MainScreen');
           }
           if (status === 'error') {

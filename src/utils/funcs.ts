@@ -1,10 +1,31 @@
 import uuid from 'react-native-uuid';
-import { Currency, Dinero, toFormat } from "dinero.js";
+import {convert, Currency, dinero, Dinero, toFormat} from 'dinero.js';
+import {ITransactionCurrency} from '@types/transactions-types';
+import {NGN} from '@dinero.js/currencies';
+import {getCurrency, rates} from '@components/common/FormattedAmount';
+
+export const getIntFromDinero = ({
+  amount,
+  currency,
+}: {
+  amount: number;
+  currency: ITransactionCurrency;
+}) => {
+  const d = dinero({
+    amount: amount !== undefined ? Math.floor(amount) : 100,
+    currency: NGN,
+    scale: 0,
+  });
+
+  const _dAmount = convert(d, getCurrency(currency ? currency : 'NGN'), rates);
+
+  return _dAmount.toJSON().amount / 10 ** _dAmount.toJSON().scale;
+};
 
 export function intlFormat(
   dineroObject: Dinero<number>,
   locale: string,
-  options = {}
+  options = {},
 ) {
   function transformer({
     amount,
@@ -15,7 +36,7 @@ export function intlFormat(
   }) {
     return amount.toLocaleString(locale, {
       ...options,
-      style: "currency",
+      style: 'currency',
       currency: currency.code,
     });
   }
@@ -23,8 +44,7 @@ export function intlFormat(
   return toFormat(dineroObject, transformer);
 }
 
-
-export const generateUUIDV4 = ():string => {
+export const generateUUIDV4 = (): string => {
   return uuid.v4() as string;
 };
 

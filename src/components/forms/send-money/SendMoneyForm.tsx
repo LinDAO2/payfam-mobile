@@ -75,6 +75,8 @@ const SendMoneyForm = () => {
           redemptionCode: redemptionCode,
           isRedeemed: false,
           senderID: profile.uid,
+          senderName: profile.username,
+          senderPhonenumber: profile.phoneNumber,
           paymentOption: '',
         }}
         onSubmit={values => {}}>
@@ -177,10 +179,14 @@ const SendMoneyForm = () => {
                 <View style={{flex: 1, marginLeft: 5}}>
                   <TextInput
                     onChangeText={text => {
-                      setFieldValue('amount', parseInt(text), true);
-                      setAmountToSend(parseInt(text));
+                      if (parseInt(text) > 0) {
+                        setFieldValue('amount', parseInt(text), true);
+                        setAmountToSend(parseInt(text));
+                      } else {
+                        setFieldValue('amount', 0, true);
+                        setAmountToSend(0);
+                      }
                     }}
-                    onChange={({nativeEvent: {eventCount, target, text}}) => {}}
                     value={`${values.amount}`}
                     placeholder="Amount"
                     style={styles.formInput}
@@ -291,6 +297,7 @@ const SendMoneyForm = () => {
                   });
                   setSubmitting(false);
                   resetForm();
+                  setFieldValue('recieverPhonenumber', '', false);
                   Alert.alert(
                     'Transaction successfully',
                     `Share redemption code ${values.redemptionCode} with reciever, ${values.recieverPhonenumber} to redeem the amount.`,

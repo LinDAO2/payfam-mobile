@@ -1,4 +1,3 @@
-
 export type IProfileStatus = 'active' | 'inactive' | 'blocked';
 
 export interface IProfileWallet {
@@ -6,6 +5,9 @@ export interface IProfileWallet {
   pendingPayout: number;
   totalCommission: number;
   credit: number;
+  ngnBalance?: number;
+  ghsBalance?: number;
+  usdtBalance?: number;
   overallIn?: number;
   overallOut?: number;
   bankAccount?: {

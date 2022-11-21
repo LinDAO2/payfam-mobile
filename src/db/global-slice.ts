@@ -1,10 +1,11 @@
-import { ICURRENCIES } from "@types/global-types";
+
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ITransactionCurrency } from "@types/transactions-types";
 
 
 export interface IGlobalState {
   pageTitle: string;
-  currency: ICURRENCIES;
+  currency: ITransactionCurrency
 }
 
 export interface IShowGlobal extends IGlobalState {}
@@ -21,7 +22,7 @@ export const globalSlice = createSlice({
     setPageTitle: (state, action: PayloadAction<string>) => {
       state.pageTitle = action.payload;
     },
-    setCurrency: (state, action: PayloadAction<ICURRENCIES>) => {
+    setCurrency: (state, action: PayloadAction<ITransactionCurrency>) => {
       state.currency = action.payload;
     },
   },

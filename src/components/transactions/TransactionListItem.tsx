@@ -1,13 +1,25 @@
-import {StyleSheet, View} from 'react-native';
-import React from 'react';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import React, {useState} from 'react';
 import {ITransactionDocument} from '@types/transactions-types';
 import {Text} from 'react-native-paper';
 import moment from 'moment';
+import FormattedAmount from '@components/common/FormattedAmount';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 interface Props {
   transaction: ITransactionDocument;
 }
 const TransactionListItem = ({transaction}: Props) => {
+  const [copied, setCopied] = useState(false);
+
+  const copyToClipboard = () => {
+    Clipboard.setString(transaction.redemptionCode);
+    setCopied(true);
+    setTimeout(() => {
+      setCopied(false);
+    }, 1000);
+  };
+
   return (
     <View
       style={{
@@ -21,38 +33,81 @@ const TransactionListItem = ({transaction}: Props) => {
         shadowRadius: 6.68,
         elevation: 5,
         margin: 4,
-        padding: 3,
+        padding: 7,
       }}>
       <Text variant="bodySmall" style={{textAlign: 'right'}}>
         {moment(transaction.addedOn.toDate()).format('lll')}
       </Text>
-      <View style={{alignItems: 'center'}}>
-        <Text variant="bodyLarge" style={{color: '#ccc'}}>
+      <View>
+        {/* <Text variant="bodyLarge" style={{color: '#ccc'}}>
           Sent
-        </Text>
+        </Text> */}
         <Text variant="bodyLarge">
-          {transaction.currency}
-          {transaction.amount}
+          <FormattedAmount
+            amount={transaction.amount}
+            currency={transaction.currency}
+          />
         </Text>
+
         <Text variant="bodyLarge" style={{color: '#ccc'}}>
-          to
+          {transaction.isRedeemed ? 'From' : 'To'}
         </Text>
-        <Text variant="bodyLarge">{transaction.recieverName}</Text>
-        <Text variant="bodyLarge">{transaction.recieverPhonenumber}</Text>
-        <View
-          style={{
-            backgroundColor: '#fdd',
-            elevation: 5,
-            padding: 4,
-            borderRadius: 30,
-          }}>
+        {transaction.isRedeemed ? (
+          <>
+            <Text variant="bodyLarge">
+              {transaction?.senderName
+                ? transaction?.senderName
+                : transaction.recieverName}
+            </Text>
+            <Text variant="bodyLarge">
+              {transaction?.senderPhonenumber
+                ? transaction?.senderPhonenumber
+                : transaction.recieverPhonenumber}
+            </Text>
+          </>
+        ) : (
+          <>
+            <Text variant="bodyLarge">{transaction.recieverName}</Text>
+            <Text variant="bodyLarge">{transaction.recieverPhonenumber}</Text>
+          </>
+        )}
+        {transaction?.redeemedcurrency && (
+          <Text variant="bodySmall">
+            redeemed to{' '}
+            <FormattedAmount
+              amount={transaction.amount}
+              currency={transaction?.redeemedcurrency}
+            />
+          </Text>
+        )}
+
+        <View style={{position: 'absolute', bottom: 0, right: 0}}>
+          <TouchableOpacity onPress={copyToClipboard}>
+            <View
+              style={{
+                backgroundColor: copied ? '#fff' : '#fdd',
+                elevation: 5,
+                padding: 4,
+                borderRadius: 30,
+              }}>
+              <Text
+                style={{
+                  color: copied
+                    ? '#000'
+                    : transaction.isRedeemed
+                    ? 'green'
+                    : 'orange',
+                  textAlign: 'center',
+                }}>
+                {copied ? 'Copied!' : transaction.redemptionCode}
+              </Text>
+            </View>
+          </TouchableOpacity>
+
           <Text style={{color: transaction.isRedeemed ? 'green' : 'orange'}}>
-            {transaction.redemptionCode}
+            {transaction.isRedeemed ? 'Redeemed' : 'Not redeemed'}
           </Text>
         </View>
-        <Text style={{color: transaction.isRedeemed ? 'green' : 'orange'}}>
-          {transaction.isRedeemed ? 'Redeemed' : 'Not redeemed'}
-        </Text>
       </View>
     </View>
   );
