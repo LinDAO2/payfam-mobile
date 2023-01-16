@@ -1,12 +1,61 @@
-import {StyleSheet, View} from 'react-native';
+import {Modal, StyleSheet, TouchableOpacity, View} from 'react-native';
 import React from 'react';
 import RedeemMoneyForm from '@components/forms/redeem-money/RedeemMoneyForm';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {Text} from 'react-native-paper';
 
-const RedeemMoneyContainer = () => {
+interface Props {
+  modal?: boolean;
+  visible?: boolean;
+  close?: any;
+  redemptionCode?: string;
+  recieverPhonenumber?: string;
+}
+const RedeemMoneyContainer = ({
+  modal,
+  visible,
+  close,
+  recieverPhonenumber,
+  redemptionCode,
+}: Props) => {
   return (
-    <View style={styles.container}>
-      <RedeemMoneyForm />
-    </View>
+    <>
+      {!modal && (
+        <View style={styles.container}>
+          <RedeemMoneyForm
+            recieverPhonenumber={recieverPhonenumber}
+            redemptionCode={redemptionCode}
+          />
+        </View>
+      )}
+
+      {modal && visible && close && (
+        <Modal
+          animationType="slide"
+          visible={visible}
+          onRequestClose={() => {
+            close();
+          }}>
+          <View style={{backgroundColor: '#ccc', flex: 1}}>
+            <View style={{paddingHorizontal: 10, paddingVertical: 15}}>
+              <TouchableOpacity
+                onPress={() => {
+                  close();
+                }}>
+                <MaterialIcons name="close" size={30} color="#000" />
+              </TouchableOpacity>
+              <Text variant="headlineMedium" style={{textAlign: 'center'}}>
+                Redeem funds
+              </Text>
+              <RedeemMoneyForm
+                recieverPhonenumber={recieverPhonenumber}
+                redemptionCode={redemptionCode}
+              />
+            </View>
+          </View>
+        </Modal>
+      )}
+    </>
   );
 };
 

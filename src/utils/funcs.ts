@@ -21,7 +21,29 @@ export const getIntFromDinero = ({
 
   return _dAmount.toJSON().amount / 10 ** _dAmount.toJSON().scale;
 };
+export const getFormattedDinero = ({
+  amount,
+  currency,
+  actual,
+}: {
+  amount: number;
+  currency: ITransactionCurrency;
+  actual?: boolean;
+}) => {
+  const d = dinero({
+    amount: amount !== undefined ? Math.floor(amount) : 100,
+    currency: actual ? getCurrency(currency ? currency : 'NGN') : NGN,
+    scale: 0,
+  });
 
+  const _cdAmount = convert(d, getCurrency(currency ? currency : 'NGN'), rates);
+
+  return actual
+    ? intlFormat(d, 'en-NG').toString()
+    : currency
+    ? intlFormat(_cdAmount, 'en-NG').toString()
+    : intlFormat(d, 'en-NG').toString();
+};
 export function intlFormat(
   dineroObject: Dinero<number>,
   locale: string,

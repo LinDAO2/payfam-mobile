@@ -1,6 +1,7 @@
-import {Alert, Image, TouchableOpacity, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {Button, Text} from 'react-native-paper';
+import {Alert, Image, StyleSheet, TouchableOpacity, View} from 'react-native';
+import React, {useState} from 'react';
+import {Button, Text, TextInput} from 'react-native-paper';
+import Spacer from '@components/common/Spacer';
 import {
   ITransactionCurrency,
   ITransactionDocument,
@@ -9,65 +10,34 @@ import {useSession} from '@hooks/app-hooks';
 import firestore from '@react-native-firebase/firestore';
 import {COLLECTIONS} from 'contants/collections';
 import {collectionServices} from '@services/root';
-
+import Clipboard from '@react-native-clipboard/clipboard';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {generateUUIDV4, getIntFromDinero} from '@utils/funcs';
 import FormattedAmount from '@components/common/FormattedAmount';
 import {getCurrencyImage} from '@helpers/collection-helpers';
 import {setProfileReload} from '@helpers/session-helpers';
 
-interface Props {
-  redemptionCode?: string;
-  recieverPhonenumber?: string;
-}
-const RedeemMoneyForm = ({redemptionCode, recieverPhonenumber}: Props) => {
-  const STEPS = ['Select currency', 'Redeem'];
+const RedeemMoneyForm = () => {
+  const STEPS = ['Verification', 'Select currency', 'Redeem'];
   const [activeStep, setActiveStep] = useState(0);
-
+  const [redemptionCode, setRedemptionCode] = useState('');
   const [processing, setProcessing] = useState(false);
   const [transaction, setTransaction] = useState<
     ITransactionDocument | undefined
   >(undefined);
   const [selectedCurrency, setSelectedCurrency] = useState('');
 
+  const profilePhonenumber = useSession().phoneNumber;
   const profileUID = useSession().uid;
 
   const handleNext = () => {
     setActiveStep(prevActiveStep => prevActiveStep + 1);
   };
 
-  useEffect(() => {
-    (async () => {
-      if (redemptionCode && recieverPhonenumber) {
-        setProcessing(true);
-        const query = firestore()
-          .collection(COLLECTIONS.transactions)
-          .where('recieverPhonenumber', '==', recieverPhonenumber)
-          .where('redemptionCode', '==', redemptionCode)
-          .orderBy('addedOn', 'desc');
-
-        const {status, list, errorMessage} = await collectionServices.getDocs(
-          query,
-        );
-
-        if (status === 'success' && list) {
-          const _transaction = list[0] as ITransactionDocument;
-
-          setTransaction(_transaction);
-          if (_transaction.isRedeemed) {
-            Alert.alert('This redmption code is used already');
-          } else {
-          
-          }
-          setProcessing(false);
-        }
-
-        if (status === 'error' && errorMessage) {
-          Alert.alert('Ooops!!', errorMessage);
-          setProcessing(false);
-        }
-      }
-    })();
-  }, [recieverPhonenumber, redemptionCode]);
+  const fetchCopiedText = async () => {
+    const text = await Clipboard.getString();
+    setRedemptionCode(text);
+  };
 
   const CURRENCY_LIST = [
     {
@@ -107,6 +77,66 @@ const RedeemMoneyForm = ({redemptionCode, recieverPhonenumber}: Props) => {
       </View>
 
       {activeStep === 0 && (
+        <View>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <TextInput
+              onChangeText={text => setRedemptionCode(text)}
+              value={redemptionCode}
+              placeholder="Enter redeptionCode "
+              style={{flex: 1}}
+            />
+            <TouchableOpacity onPress={fetchCopiedText}>
+              <MaterialIcons name="content-paste" size={30} />
+            </TouchableOpacity>
+          </View>
+          <Spacer space={30} />
+          <Button
+            loading={processing}
+            disabled={processing}
+            mode="contained-tonal"
+            onPress={async () => {
+              if (redemptionCode.length === 0 || redemptionCode.length < 2) {
+                Alert.alert('Enter a valid redemption code!');
+              } else if (profilePhonenumber.length === 0) {
+                Alert.alert('phonenumber not found!');
+              } else {
+                setProcessing(true);
+                const query = firestore()
+                  .collection(COLLECTIONS.transactions)
+                  .where('recieverPhonenumber', '==', profilePhonenumber)
+                  .where('redemptionCode', '==', redemptionCode)
+                  .orderBy('addedOn', 'desc');
+
+                const {status, list, errorMessage} =
+                  await collectionServices.getDocs(query);
+
+                if (status === 'success' && list) {
+                  const _transaction = list[0] as ITransactionDocument;
+                  setTransaction(_transaction);
+                  if (_transaction.isRedeemed) {
+                    Alert.alert('This redmption code is used already');
+                  } else {
+                    handleNext();
+                  }
+                  setProcessing(false);
+                }
+
+                if (status === 'error' && errorMessage) {
+                  Alert.alert('Ooops!!', errorMessage);
+                  setProcessing(false);
+                }
+              }
+            }}>
+            Verify
+          </Button>
+        </View>
+      )}
+      {activeStep === 1 && (
         <>
           <View
             style={[
@@ -197,7 +227,7 @@ const RedeemMoneyForm = ({redemptionCode, recieverPhonenumber}: Props) => {
           )}
         </>
       )}
-      {activeStep === 1 && transaction && (
+      {activeStep === 2 && transaction && (
         <>
           <View style={{alignItems: 'center'}}>
             <Image
@@ -224,7 +254,7 @@ const RedeemMoneyForm = ({redemptionCode, recieverPhonenumber}: Props) => {
                 flexDirection: 'row',
                 width: '100%',
               }}>
-              <Button mode="contained-tonal" onPress={() => setActiveStep(0)}>
+              <Button mode="contained-tonal" onPress={() => setActiveStep(1)}>
                 Back
               </Button>
               <Button
@@ -298,7 +328,7 @@ const RedeemMoneyForm = ({redemptionCode, recieverPhonenumber}: Props) => {
                       setProfileReload(true);
 
                       setActiveStep(0);
-
+                      setRedemptionCode('');
                       setProcessing(false);
                       setTransaction(undefined);
                       setSelectedCurrency('');
@@ -324,3 +354,5 @@ const RedeemMoneyForm = ({redemptionCode, recieverPhonenumber}: Props) => {
 };
 
 export default RedeemMoneyForm;
+
+const styles = StyleSheet.create({});

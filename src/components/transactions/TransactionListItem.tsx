@@ -1,25 +1,19 @@
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {Image, View} from 'react-native';
 import React, {useState} from 'react';
 import {ITransactionDocument} from '@types/transactions-types';
-import {Text} from 'react-native-paper';
+import {Button, Text} from 'react-native-paper';
 import moment from 'moment';
-import FormattedAmount from '@components/common/FormattedAmount';
-import Clipboard from '@react-native-clipboard/clipboard';
+import {useSession} from '@hooks/app-hooks';
+import Spacer from '@components/common/Spacer';
+import {getFormattedDinero} from '@utils/funcs';
+import RedeemMoneyContainer from '@components/redeem-money/RedeemMoneyContainer';
 
 interface Props {
   transaction: ITransactionDocument;
 }
 const TransactionListItem = ({transaction}: Props) => {
-  const [copied, setCopied] = useState(false);
-
-  const copyToClipboard = () => {
-    Clipboard.setString(transaction.redemptionCode);
-    setCopied(true);
-    setTimeout(() => {
-      setCopied(false);
-    }, 1000);
-  };
-
+  const profileUID = useSession().uid;
+  const [showRedeemFundsModal, setShowRedeemFundsModal] = useState(false);
   return (
     <View
       style={{
@@ -34,85 +28,91 @@ const TransactionListItem = ({transaction}: Props) => {
         elevation: 5,
         margin: 4,
         padding: 7,
+        minHeight: 100,
       }}>
       <Text variant="bodySmall" style={{textAlign: 'right'}}>
         {moment(transaction.addedOn.toDate()).format('lll')}
       </Text>
-      <View>
-        {/* <Text variant="bodyLarge" style={{color: '#ccc'}}>
-          Sent
-        </Text> */}
-        <Text variant="bodyLarge">
-          <FormattedAmount
-            amount={transaction.amount}
-            currency={transaction.currency}
+      <View style={{flexDirection: 'row'}}>
+        <View style={{flex: 1}}>
+          <Image
+            source={{
+              uri: `https://avatars.dicebear.com/api/pixel-art/${transaction.recieverName}.png`,
+            }}
+            style={{
+              width: 50,
+              height: 50,
+              borderRadius: 25,
+            }}
           />
-        </Text>
-
-        <Text variant="bodyLarge" style={{color: '#ccc'}}>
-          {transaction.isRedeemed ? 'From' : 'To'}
-        </Text>
-        {transaction.isRedeemed ? (
-          <>
-            <Text variant="bodyLarge">
-              {transaction?.senderName
-                ? transaction?.senderName
-                : transaction.recieverName}
-            </Text>
-            <Text variant="bodyLarge">
-              {transaction?.senderPhonenumber
-                ? transaction?.senderPhonenumber
-                : transaction.recieverPhonenumber}
-            </Text>
-          </>
-        ) : (
-          <>
-            <Text variant="bodyLarge">{transaction.recieverName}</Text>
-            <Text variant="bodyLarge">{transaction.recieverPhonenumber}</Text>
-          </>
-        )}
-        {transaction?.redeemedcurrency && (
-          <Text variant="bodySmall">
-            redeemed to{' '}
-            <FormattedAmount
-              amount={transaction.amount}
-              currency={transaction?.redeemedcurrency}
-            />
-          </Text>
-        )}
-
-        <View style={{position: 'absolute', bottom: 0, right: 0}}>
-          <TouchableOpacity onPress={copyToClipboard}>
-            <View
-              style={{
-                backgroundColor: copied ? '#fff' : '#fdd',
-                elevation: 5,
-                padding: 4,
-                borderRadius: 30,
-              }}>
-              <Text
-                style={{
-                  color: copied
-                    ? '#000'
-                    : transaction.isRedeemed
-                    ? 'green'
-                    : 'orange',
-                  textAlign: 'center',
-                }}>
-                {copied ? 'Copied!' : transaction.redemptionCode}
+        </View>
+        <View style={{flex: 4}}>
+          {transaction.isRedeemed ? (
+            <>
+              <Text variant="titleMedium">
+                {transaction?.senderName
+                  ? transaction?.senderName
+                  : transaction.recieverName}
               </Text>
-            </View>
-          </TouchableOpacity>
-
-          <Text style={{color: transaction.isRedeemed ? 'green' : 'orange'}}>
-            {transaction.isRedeemed ? 'Redeemed' : 'Not redeemed'}
+              <Text variant="labelSmall">
+                {transaction?.senderPhonenumber
+                  ? transaction?.senderPhonenumber
+                  : transaction.recieverPhonenumber}
+              </Text>
+            </>
+          ) : (
+            <>
+              <Text variant="titleMedium">{transaction.recieverName}</Text>
+              <Text variant="labelSmall">
+                {transaction.recieverPhonenumber}
+              </Text>
+            </>
+          )}
+          <Spacer space={5} />
+          <Text variant="bodySmall" style={{color: '#ccc'}}>
+            {profileUID === transaction.senderID
+              ? `You just sent ${getFormattedDinero({
+                  amount: transaction.amount,
+                  currency: transaction?.redeemedcurrency,
+                })} to ${transaction.recieverPhonenumber} via ${
+                  transaction.paymentOption
+                }`
+              : ``}
           </Text>
         </View>
+      </View>
+      <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+        {transaction.isRedeemed && (
+          <Text style={{color: 'green'}}>Redeemed</Text>
+        )}
+        {transaction.isRedeemed == false && (
+          <Button
+            buttonColor="#142C8E"
+            textColor="#fff"
+            onPress={() => {
+              setShowRedeemFundsModal(!showRedeemFundsModal);
+            }}>
+            Redeem Funds
+          </Button>
+        )}
+        {/* {transaction.isRedeemed == false && transaction.senderID !== profileUID  && <Button
+            buttonColor="#142C8E"
+            textColor="#fff"
+            onPress={() => {
+              setShowRedeemFundsModal(!showRedeemFundsModal);
+            }}>
+            Redeem Funds
+          </Button>} */}
+        <RedeemMoneyContainer
+          modal
+          visible={showRedeemFundsModal}
+          close={() => setShowRedeemFundsModal(false)}
+          recieverPhonenumber={transaction.recieverPhonenumber}
+          redemptionCode={transaction.redemptionCode}
+        />
       </View>
     </View>
   );
 };
 
 export default TransactionListItem;
-
-const styles = StyleSheet.create({});

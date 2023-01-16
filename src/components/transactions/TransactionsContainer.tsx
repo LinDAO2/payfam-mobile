@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native';
+
 import React from 'react';
 import TransactionList from './TransactionList';
 
@@ -7,5 +7,3 @@ const TransactionsContainer = () => {
 };
 
 export default TransactionsContainer;
-
-const styles = StyleSheet.create({});

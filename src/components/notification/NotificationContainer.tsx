@@ -53,7 +53,7 @@ const NotificationContainer = () => {
         onPress={() => {
           setShowModal(!showModal);
         }}>
-        <MaterialIcons name="notifications" size={30} color="#fff" />
+        <MaterialIcons name="notifications" size={30} color="#000" />
       </TouchableOpacity>
       <Modal
         animationType="slide"

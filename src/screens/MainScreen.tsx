@@ -227,15 +227,7 @@ const MainScreen = () => {
               }}>
               @{profile.username}
             </Text>
-            <TouchableOpacity>
-              <Text
-                style={{
-                  marginTop: 6,
-                  color: 'white',
-                }}>
-                View Profile
-              </Text>
-            </TouchableOpacity>
+            
           </View>
           <View style={{flexGrow: 1, marginTop: 10}}>
             {
@@ -327,53 +319,44 @@ const MainScreen = () => {
               },
             ],
           }}>
-          <LinearGradient
-            style={{height: 100, paddingHorizontal: 15, paddingVertical: 20}}
-            colors={['#373ae6ff', '#FFF']}>
-            <TouchableOpacity
-              onPress={() => {
-                // Do Actions Here....
-                // Scaling the view...
-                ScalingView();
-              }}
-              style={{width: 45, height: 45}}>
-              <MaterialCommunityIcons
-                name={
-                  showMenu ? 'close-circle' : 'microsoft-xbox-controller-menu'
-                }
-                size={35}
-                color="#fff"
-                style={{marginTop: 10}}
-              />
-            </TouchableOpacity>
+          <View
+            style={{height: 100, paddingHorizontal: 15, paddingVertical: 20}}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <TouchableOpacity
+                onPress={() => {
+                  // Do Actions Here....
+                  // Scaling the view...
+                  ScalingView();
+                }}>
+                <MaterialCommunityIcons
+                  name={showMenu ? 'close-circle' : 'menu'}
+                  size={30}
+                  color="#000"
+                />
+              </TouchableOpacity>
+
+              <Text style={{fontSize: 20, marginLeft: 10,fontWeight:'800'}}>
+                Hello {profile.username},
+              </Text>
+            </View>
 
             <View
               style={{
                 position: 'absolute',
                 right: 20,
-                top: 30,
+                top: 25,
                 flexDirection: 'row',
                 alignItems: 'center',
               }}>
-              <NotificationContainer />
               <ActivityLogContainer />
+              <NotificationContainer />
             </View>
-            <Text
-              style={{
-                fontSize: 30,
-                fontWeight: 'bold',
-                color: 'black',
-                paddingTop: 20,
-                textAlign: 'center',
-              }}>
-              {currentTab}
-            </Text>
-          </LinearGradient>
+          </View>
 
           <View
             style={{
               paddingHorizontal: 15,
-              paddingVertical: 20,
+              // paddingVertical: 20,
             }}>
             {currentTab === 'Home' && <HomeContainer />}
             {currentTab === 'Send Money' && <SendMoneyContainer />}
@@ -473,11 +456,7 @@ const MainScreen = () => {
               onPress={() => {
                 setCurrentTab('Home');
               }}>
-              <MaterialCommunityIcons
-                name="home-analytics"
-                size={40}
-                color="#047cfdff"
-              />
+              <MaterialCommunityIcons name="home" size={40} color="#047cfdff" />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {

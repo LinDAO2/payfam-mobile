@@ -13,7 +13,7 @@ const ActivityLogContainer = () => {
         onPress={() => {
           setShowModal(!showModal);
         }}>
-        <MaterialIcons name="book" size={30} color="#fff" />
+        <MaterialIcons name="book" size={30} color="#000" />
       </TouchableOpacity>
       <Modal
         animationType="slide"

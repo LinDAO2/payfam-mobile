@@ -1,6 +1,13 @@
-import {Dimensions} from 'react-native';
+import {Dimensions, FlatList} from 'react-native';
 import React from 'react';
 import Carousel from '@components/common/Carousel';
+import HomeBalanceSummary from './HomeBalanceSummary';
+import HomeActions from './HomeActions';
+import TransactionList from '@components/transactions/TransactionList';
+import {generateUUIDV4} from '@utils/funcs';
+import Spacer from '@components/common/Spacer';
+import {Text} from 'react-native-paper';
+import HomePayAgain from './HomePayAgain';
 
 const {width} = Dimensions.get('window');
 
@@ -14,9 +21,29 @@ const HomeContainer = () => {
 
   return (
     <>
-      <Carousel
-        images={ADS_LIST}
-        imageCardSize={{width: width - 30, height: 150}}
+      <FlatList
+        data={[]}
+        keyExtractor={_ => generateUUIDV4()}
+        renderItem={() => <></>}
+        ListHeaderComponent={() => (
+          <>
+            <HomeBalanceSummary />
+            <Carousel
+              images={ADS_LIST}
+              imageCardSize={{width: width - 30, height: 150}}
+            />
+            <HomeActions />
+            <HomePayAgain />
+          </>
+        )}
+        ListFooterComponent={() => (
+          <>
+            <Spacer space={20} />
+            <Text variant='titleMedium'>History transactions</Text>
+            <Spacer space={10} />
+            <TransactionList />
+          </>
+        )}
       />
     </>
   );

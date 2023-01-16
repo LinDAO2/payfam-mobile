@@ -1,4 +1,4 @@
-import {FlatList, Text, useWindowDimensions, View} from 'react-native';
+import {Dimensions, FlatList, Text, useWindowDimensions, View} from 'react-native';
 import React, {useEffect} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import {COLLECTIONS} from 'contants/collections';
@@ -13,6 +13,9 @@ import TransactionListItem from './TransactionListItem';
 import {TabView, TabBar, SceneMap} from 'react-native-tab-view';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
+const {height} = Dimensions.get('window');
+
 
 const FirstRoute = () => <View style={{flex: 1, backgroundColor: '#ff4081'}} />;
 
@@ -54,7 +57,7 @@ const TransactionList = () => {
   }, []);
 
   return (
-    <View style={{width: '100%'}}>
+    <View style={{width: '100%',height}}>
       <View style={{height: 50}}>
         <TabView
           navigationState={{index, routes}}
@@ -157,6 +160,7 @@ const TransactionList = () => {
             data={collectionState.list}
             keyExtractor={_iten => generateUUIDV4()}
             renderItem={({item}) => <TransactionListItem transaction={item} />}
+            nestedScrollEnabled
           />
         )}
     </View>
